@@ -36,7 +36,7 @@ endfunction
 function! s:toString(obj)
   return type(a:obj) == type({}) && has_key(a:obj, 'toString')
   \   && type(a:obj.toString) == type(function('function')) ?
-  \      a:obj.toString() : PP(a:obj)
+  \      a:obj.toString() : string(a:obj)
 endfunction
 
 
