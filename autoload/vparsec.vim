@@ -384,6 +384,30 @@ endfunction
 
 
 
+let s:return = s:Parser.extend()
+let s:return.name = 'return'
+function! s:return.initialize(parser, returns)
+  let self.parser = a:parser
+  let self.returns = a:returns
+endfunction
+function! s:return.apply(input)
+  let result = self.parser.parse(a:input)
+  return result.successful
+  \ ? s:ParseResult.success(self.returns, result.next)
+  \ : result
+endfunction
+function! s:return.toString()
+  return self.parser.toString()
+endfunction
+
+
+function! s:Parser.return(o)
+  return s:return.new(self, o)
+endfunction
+
+
+
+
 let s:many = s:Parser.extend()
 let s:many.name = 'many'
 function! s:many.initialize(parser)
