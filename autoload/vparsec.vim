@@ -162,8 +162,7 @@ let s:Parsers = s:Object.extend()
 
 
 
-let s:eof = s:Parser.extend()
-let s:eof.name = 'eof'
+let s:eof = s:Parser.extend().named('eof')
 function! s:eof.apply(input)
   return a:input.atEnd()
   \ ? s:ParseResult.success(s:null, a:input)
@@ -179,8 +178,7 @@ endfunction
 
 
 
-let s:seq = s:Parser.extend()
-let s:seq.name = 'seq'
+let s:seq = s:Parser.extend().named('seq')
 function! s:seq.initialize(parsers)
   let self.parsers = a:parsers
 endfunction
@@ -224,8 +222,7 @@ endfunction
 
 
 
-let s:or = s:Parser.extend()
-let s:or.name = 'or'
+let s:or = s:Parser.extend().named('or')
 function! s:or.initialize(parsers)
   let self.parsers = a:parsers
 endfunction
@@ -248,8 +245,7 @@ endfunction
 
 
 
-let s:string = s:Parser.extend()
-let s:string.name = 'string'
+let s:string = s:Parser.extend().named('string')
 function! s:string.initialize(str)
   let self.string = a:str
   let self.len = strlen(a:str)
@@ -276,8 +272,7 @@ endfunction
 
 
 
-let s:regex = s:Parser.extend()
-let s:regex.name = 'regex'
+let s:regex = s:Parser.extend().named('regex')
 function! s:regex.initialize(pat)
   let self.pattern = a:pat
 endfunction
@@ -307,8 +302,7 @@ endfunction
 
 
 
-let s:lazy = s:Parser.extend()
-let s:lazy.name = 'lazy'
+let s:lazy = s:Parser.extend().named('lazy')
 function! s:lazy.apply(input)
   return self.parser.parse(a:input)
 endfunction
@@ -323,8 +317,7 @@ endfunction
 
 
 
-let s:constant = s:Parser.extend()
-let s:constant.name = 'constant'
+let s:constant = s:Parser.extend().named('constant')
 function! s:constant.initialize(obj)
   let self.obj = a:obj
 endfunction
@@ -358,8 +351,7 @@ endfunction
 
 " ----------------------------------------------------------------------------
 " Parser
-let s:map = s:Parser.extend()
-let s:map.name = 'map'
+let s:map = s:Parser.extend().named('map')
 function! s:map.initialize(parser, func)
   let self.parser = a:parser
   let self.func = a:func
@@ -384,8 +376,7 @@ endfunction
 
 
 
-let s:return = s:Parser.extend()
-let s:return.name = 'return'
+let s:return = s:Parser.extend().named('return')
 function! s:return.initialize(parser, returns)
   let self.parser = a:parser
   let self.returns = a:returns
@@ -408,8 +399,7 @@ endfunction
 
 
 
-let s:many = s:Parser.extend()
-let s:many.name = 'many'
+let s:many = s:Parser.extend().named('many')
 function! s:many.initialize(parser)
   let self.parser = a:parser
 endfunction
