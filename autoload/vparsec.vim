@@ -424,7 +424,7 @@ endfunction
 
 let s:sep = {}
 function! s:sep.flatten(r)  " FIXME: wrong name
-  return [r[0]] + r[1]
+  return [a:r[0]] + a:r[1]
 endfunction
 
 function! s:Parser.many1()
