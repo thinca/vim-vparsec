@@ -357,12 +357,10 @@ function! s:map.initialize(parser, func)
   let self.func = a:func
 endfunction
 function! s:map.apply(input)
-  let input = a:input
-  let result = self.parser.parse(input)
-  if !result.successful
-    return result
-  endif
-  return s:ParseResult.success(self.func(result.result), result.next)
+  let result = self.parser.parse(a:input)
+  return result.successful
+  \ ? s:ParseResult.success(self.func(result.result), result.next)
+  \ : result
 endfunction
 function! s:map.toString()
   return self.parser.toString()
