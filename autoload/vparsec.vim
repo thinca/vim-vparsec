@@ -495,9 +495,8 @@ function! s:Parser.phrase()
 endfunction
 
 
-function! s:Parser.lexer(...)
-  let delim = a:0 ? a:1 : s:Parsers.regex('\s*')
-  return delim.opt().next(self.sepEndBy(delim)).at(1)
+function! s:Parser.lexer(delim)
+  return a:delim.opt().next(self.sepEndBy(a:delim)).at(1)
 endfunction
 
 
