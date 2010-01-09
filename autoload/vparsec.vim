@@ -120,6 +120,8 @@ endfunction
 function! s:Parser.toReader(input)
   if type(a:input) == type('')
     return s:StringReader.new(a:input)
+  elseif type(a:input) == type([])
+    return s:ListReader.new(a:input)
   endif
   return a:input
 endfunction
