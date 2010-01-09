@@ -111,13 +111,13 @@ endfunction
 
 let s:Parser = s:Object.extend()
 function! s:Parser.parse(input)
-  let input = self.asReader(a:input)
+  let input = self.toReader(a:input)
   return self.apply(input)
 endfunction
 function! s:Parser.apply(input)
   return s:ParseResult.failure('abstract parser', input)
 endfunction
-function! s:Parser.asReader(input)
+function! s:Parser.toReader(input)
   if type(a:input) == type('')
     return s:StringReader.new(a:input)
   endif
@@ -194,7 +194,7 @@ function! s:seq.toString()
 endfunction
 
 function! s:Parsers.seq(...)
-  return s:seq.new(map(copy(a:000), 'self.asParser(v:val)'))
+  return s:seq.new(map(copy(a:000), 'self.toParser(v:val)'))
 endfunction
 
 
@@ -217,7 +217,7 @@ function! s:or.toString()
 endfunction
 
 function! s:Parsers.or(...)
-  return s:or.new(map(copy(a:000), 'self.asParser(v:val)'))
+  return s:or.new(map(copy(a:000), 'self.toParser(v:val)'))
 endfunction
 
 
@@ -315,7 +315,7 @@ endfunction
 
 
 
-function! s:Parsers.asParser(p)
+function! s:Parsers.toParser(p)
   if type(a:p) == type('')
     return self.string(a:p)
   elseif type(a:p) == type([])
