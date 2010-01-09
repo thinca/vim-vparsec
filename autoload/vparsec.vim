@@ -85,49 +85,6 @@ endfunction
 
 
 
-let s:Scanner = s:Reader.extend()
-function! s:Scanner.initialize(in, token, ...)
-  let self.in = type(a:in) == type('') ? s:StringReader.new(a:in) : a:in
-  let self.token = a:token
-  let self.whitespace = a:0 ? a:1 : s:Parsers.regex('\s*')
-  let self.offset = self.in.offset
-endfunction
-function! s:Scanner.atEnd()
-  call self._t()
-  return in.atEnd()  " FIXME: end of whitespace
-endfunction
-function! s:Scanner.first()
-  call self._t()
-  return self.tok
-endfunction
-function! s:Scanner.rest()
-  call self._t()
-  return s:Scanner.new(self.nextin, self.token)
-endfunction
-function! s:Scanner._t()
-  if has_key(self, 'tok')
-    return
-  endif
-  let res1 = self.whitespace.parse(self.in)
-  if res1.successful
-    let res2 = self.token.parse(res1.next)
-    if res2.successful
-      let self.tok = res2.result
-      let self.nextin = self.next
-      return
-    endif
-  endif
-  let self.tok = []  " FIXME: error token
-  let self.nextin = self.in
-endfunction
-function! s:Scanner.toString()
-  return printf('Scanner(%s, %s, %s)', self.in.toString(),
-  \             self.token.toString(), self.whitespace.toString())
-endfunction
-
-
-
-
 let s:ParseResult = s:Object.extend()
 function! s:ParseResult.success(result, next)
   let res = s:ParseResult.new()
@@ -507,8 +464,11 @@ function! vparsec#parsers()
   return s:Parsers.extend()
 endfunction
 
-function! vparsec#scanner(str, token)
-  return s:Scanner.new(a:str, a:token)
+function! vparsec#scanner(str, token, ignore)
+  let tokenizer = a:token.lexer(a:ignore)
+  let result = self.tokenizer.parse(a:str)
+  let tokens = result.successful ? result.result : []
+  return s:ListReader.new(tokens)
 endfunction
 
 
