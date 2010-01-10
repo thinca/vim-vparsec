@@ -51,7 +51,7 @@ function! s:ListReader.initialize(list, ...)
   let self.offset = a:0 ? a:1 : 0
 endfunction
 function! s:ListReader.atEnd()
-  return len(self.list) <= self.offset
+  return len(self.list) - 1 <= self.offset
 endfunction
 function! s:ListReader.first()
   return self.list[self.offset]
@@ -71,7 +71,7 @@ function! s:StringReader.initialize(str, ...)
   let self.offset = a:0 ? a:1 : 0
 endfunction
 function! s:StringReader.atEnd()
-  return strlen(self.source) <= self.offset
+  return strlen(self.source) - 1 <= self.offset
 endfunction
 function! s:StringReader.first()
   return self.source[self.offset]
