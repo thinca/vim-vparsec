@@ -466,11 +466,37 @@ function! vparsec#parsers()
   return s:Parsers.extend()
 endfunction
 
-function! vparsec#scanner(str, token, ignore)
-  let tokenizer = a:token.lexer(a:ignore)
-  let result = self.tokenizer.parse(a:str)
-  let tokens = result.successful ? result.result : []
-  return s:ListReader.new(tokens)
+
+
+
+let s:TokenParser = s:Parser.extend().named('token')
+function! s:TokenParser.initialize(p)
+  let self.parser = a:p
+endfunction
+function! s:TokenParser.apply(input)
+  let f = a:input.first()
+  let result = self.parser.phrase().parse(s:StringReader.new(f))
+  return result.successful
+  \ ? s:ParseResult.success(result.result, a:input.rest())
+  \ : s:ParseResult.failure(
+  \   printf('"%s" expected but "%s" found', self.parser.toString(), f), a:input)
+endfunction
+function! s:TokenParser.toString()
+  return '`' . self.parser.toString() . '`'
+endfunction
+
+
+let s:Scanners = s:Parsers.extend()
+function! s:Scanners.toParser(p)
+  let p = self.super.toParser(a:p)
+  if type(p) == type({}) && (has_key(p, 'string') || has_key(p, 'pattern'))
+    return s:TokenParser.new(p)
+  endif
+  return p
+endfunction
+
+function! vparsec#scanners()
+  return s:Scanners.new()
 endfunction
 
 
