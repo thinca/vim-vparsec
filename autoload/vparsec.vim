@@ -51,7 +51,7 @@ function! s:ListReader.initialize(list, ...)
   let self.offset = a:0 ? a:1 : 0
 endfunction
 function! s:ListReader.atEnd()
-  return strlen(self.list) <= self.offset
+  return len(self.list) <= self.offset
 endfunction
 function! s:ListReader.first()
   return self.list[self.offset]
@@ -60,7 +60,7 @@ function! s:ListReader.rest()
   return self.atEnd() ? self : s:ListReader.new(self.list, self.offset + 1)
 endfunction
 function! s:ListReader.toString()
-  return printf('ListReader(%s, %s)', self.list, self.offset)
+  return printf('ListReader(%s, %s)', string(self.list), self.offset)
 endfunction
 
 
