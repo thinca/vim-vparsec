@@ -4,6 +4,8 @@
 " License: Creative Commons Attribution 2.1 Japan License
 "          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
 
+unlockvar 3 s:
+
 let s:save_cpo = &cpo
 set cpo&vim
 
@@ -496,6 +498,8 @@ function! s:Scanners.toParser(p)
   return p
 endfunction
 
+
+lockvar 3 s:
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
