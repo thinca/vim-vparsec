@@ -86,24 +86,25 @@ endfunction
 
 
 let s:ParseResult = s:Object.extend()
-function! s:ParseResult.success(result, next)
-  let res = s:ParseResult.new()
-  let res.successful = 1
-  let res.result = a:result
-  let res.next = a:next
-  return res
+
+let s:Success = s:ParseResult.extend()
+function! s:Success.initialize(result, next)
+  let self.successful = 1
+  let self.result = a:result
+  let self.next = a:next
 endfunction
-function! s:ParseResult.failure(mes, next)
-  let res = s:ParseResult.new()
-  let res.successful = 0
-  let res.message = a:mes
-  let res.next = a:next
-  return res
+function! s:Success.toString()
+  return 'Success(' . s:toString(self.result) . ', ' . s:toString(self.next) . ')'
 endfunction
-function! s:ParseResult.toString()
-  return self.successful
-  \ ? 'Success(' . s:toString(self.result) . ', ' . s:toString(self.next) . ')'
-  \ : 'Failure(' . self.message . ', ' . s:toString(self.next) . ')'
+
+let s:Failure = s:ParseResult.extend()
+function! s:Failure.initialize(mes, next)
+  let self.successful = 0
+  let self.message = a:mes
+  let self.next = a:next
+endfunction
+function! s:Failure.toString()
+  return 'Failure(' . self.message . ', ' . s:toString(self.next) . ')'
 endfunction
 
 
@@ -115,7 +116,7 @@ function! s:Parser.parse(input)
   return self.apply(input)
 endfunction
 function! s:Parser.apply(input)
-  return s:ParseResult.failure('abstract parser', input)
+  return s:Failure.new('abstract parser', input)
 endfunction
 function! s:Parser.toReader(input)
   if type(a:input) == type('')
@@ -144,8 +145,8 @@ let s:Parsers = s:Object.extend()
 let s:eof = s:Parser.extend().named('eof')
 function! s:eof.apply(input)
   return a:input.atEnd()
-  \ ? s:ParseResult.success(s:null, a:input)
-  \ : s:ParseResult.failure('end of input expected', a:input)
+  \ ? s:Success.new(s:null, a:input)
+  \ : s:Failure.new('end of input expected', a:input)
 endfunction
 function! s:eof.toString()
   return '[eof]'
@@ -181,7 +182,7 @@ function! s:seq.apply(input)
       let res = res1
     endif
   endif
-  return s:ParseResult.success(res, input)
+  return s:Success.new(res, input)
 endfunction
 function! s:seq.at(at, ...)
   let s:p = self.clone()
@@ -231,13 +232,13 @@ function! s:string.initialize(str)
 endfunction
 function! s:string.apply(input)
   if !has_key(a:input, 'source') || type(a:input.source) != type('')
-    return s:ParseResult.failure('not a StringReader', a:input)
+    return s:Failure.new('not a StringReader', a:input)
   endif
   let source = a:input.source[a:input.offset :]
   return self.len <= strlen(source) && self.string ==# source[: self.len - 1]
-  \   ? s:ParseResult.success(self.string,
+  \   ? s:Success.new(self.string,
   \       s:StringReader.new(a:input.source, a:input.offset + self.len))
-  \   : s:ParseResult.failure(
+  \   : s:Failure.new(
   \     printf('"%s" expected but "%s" found', self.string, a:input.first()),
   \                           a:input)
 endfunction
@@ -257,16 +258,16 @@ function! s:regex.initialize(pat)
 endfunction
 function! s:regex.apply(input)
   if !has_key(a:input, 'source') || type(a:input.source) != type('')
-    return s:ParseResult.failure('not a StringReader.', a:input)
+    return s:Failure.new('not a StringReader.', a:input)
   endif
   let source = a:input.source[a:input.offset :]
   let pat = '^' . self.pattern
   if source =~# pat
     let s = matchstr(source, pat)
-    return s:ParseResult.success(s,
+    return s:Success.new(s,
   \        s:StringReader.new(a:input.source, a:input.offset + strlen(s)))
   endif
-  return s:ParseResult.failure(
+  return s:Failure.new(
   \ printf('string matching regex "%s" expected but "%s" found',
   \        self.pattern, a:input.first()), a:input)
 endfunction
@@ -301,7 +302,7 @@ function! s:constant.initialize(obj)
   let self.obj = a:obj
 endfunction
 function! s:constant.apply(input)
-  return s:ParseResult.success(self.obj, a:input)
+  return s:Success.new(self.obj, a:input)
 endfunction
 function! s:constant.toString()
   return 'constant(' . s:toString(self.obj) . ')'
@@ -338,7 +339,7 @@ endfunction
 function! s:map.apply(input)
   let result = self.parser.parse(a:input)
   return result.successful
-  \ ? s:ParseResult.success(self.func(result.result), result.next)
+  \ ? s:Success.new(self.func(result.result), result.next)
   \ : result
 endfunction
 function! s:map.toString()
@@ -361,7 +362,7 @@ endfunction
 function! s:return.apply(input)
   let result = self.parser.parse(a:input)
   return result.successful
-  \ ? s:ParseResult.success(self.returns, result.next)
+  \ ? s:Success.new(self.returns, result.next)
   \ : result
 endfunction
 function! s:return.toString()
@@ -391,7 +392,7 @@ function! s:many.apply(input)
     let input = result.next
     call add(res, result.result)
   endwhile
-  return s:ParseResult.success(res, input)
+  return s:Success.new(res, input)
 endfunction
 function! s:many.toString()
   return self.parser.toString() . '*'
@@ -477,8 +478,8 @@ function! s:TokenParser.apply(input)
   let f = a:input.first()
   let result = self.parser.phrase().parse(s:StringReader.new(f))
   return result.successful
-  \ ? s:ParseResult.success(result.result, a:input.rest())
-  \ : s:ParseResult.failure(
+  \ ? s:Success.new(result.result, a:input.rest())
+  \ : s:Failure.new(
   \   printf('"%s" expected but "%s" found', self.parser.toString(), f), a:input)
 endfunction
 function! s:TokenParser.toString()
