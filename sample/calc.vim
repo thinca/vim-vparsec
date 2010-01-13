@@ -1,7 +1,9 @@
 " This is a sample for vparsec.vim
 
 function! s:build_calculator()
-  let p = vparsec#parsers()
+  call vparsec#import(l:)
+
+  let p = Parsers.new()
 
   let conv = {}
   function! conv.expr(res)

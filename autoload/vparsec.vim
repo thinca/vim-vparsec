@@ -463,8 +463,8 @@ endfunction
 
 
 
-function! vparsec#parsers()
-  return s:Parsers.extend()
+function! vparsec#import(...)
+  return extend(a:0 ? a:1 : {}, s:)
 endfunction
 
 
@@ -494,10 +494,6 @@ function! s:Scanners.toParser(p)
     return s:TokenParser.new(p)
   endif
   return p
-endfunction
-
-function! vparsec#scanners()
-  return s:Scanners.new()
 endfunction
 
 

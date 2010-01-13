@@ -1,5 +1,7 @@
 " This is a sample for vparsec.vim
 function! Calculator(input)
+  call vparsec#import(l:)
+
   let conv = {}
   function! conv.expr(res)
     " res = [firstToken, [op, rhs]*]
@@ -13,7 +15,7 @@ function! Calculator(input)
       return str2float(a:res)
   endfunction
 
-  let p = vparsec#parsers()
+  let p = Parsers.new()
 
   let expr = p.lazy().named('expr')
 
@@ -22,7 +24,7 @@ function! Calculator(input)
   let whitespace = p.regex('\s*')
   let lexer = token.lexer(whitespace)
 
-  let s = vparsec#scanners()
+  let s = Scanners.new()
 
   let tnumber = s.toParser(number)
   let term = s.or(tnumber.map(conv.term), s.seq('(', expr, ')').at(1)).named('term')
