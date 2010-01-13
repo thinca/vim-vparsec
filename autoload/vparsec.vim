@@ -185,12 +185,12 @@ function! s:seq.apply(input)
   return s:Success.new(res, input)
 endfunction
 function! s:seq.at(at, ...)
-  let s:p = self.clone()
-  let s:p.point = a:at
+  let p = self.clone()
+  let p.point = a:at
   if a:0
-    let s:p.end = a:1
+    let p.end = a:1
   endif
-  return s:p
+  return p
 endfunction
 function! s:seq.toString()
   return '(' . join(map(copy(self.parsers), 'v:val.toString()')) . ')'
