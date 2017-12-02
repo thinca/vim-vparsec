@@ -31,4 +31,4 @@ function! Funcaller(input)
   return result.successful ? result.result : result.toString()
 endfunction
 
-call Funcaller('echo ("HelloWorld!")')
+call Funcaller('echo ("HelloWorld")')
