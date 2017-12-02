@@ -20,7 +20,7 @@ function! Funcaller(input)
   let lexer = token.lexer(whitespace)
 
   let s = Scanners.new()
-  let funcall = (s.seq(ident, '(', string, ')')).map(conv.expr).named('funcall')
+  let funcall = (s.seq(ident, '(', string, ')')).map(conv.expr)
   call expr.set(funcall)
 
   let result = lexer.parse(a:input)
