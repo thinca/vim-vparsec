@@ -4,7 +4,6 @@ function! Funcaller(input)
 
   let conv = {}
   function! conv.expr(res)
-    " res = [firstToken, [op, rhs]*]
     let [ident, left_parenthesis, arg, right_parenthesis] = a:res
     execute printf('%s(%s)', ident, arg)
   endfunction
